@@ -20,12 +20,20 @@ class UserFactory extends Factory
      * Define the model's default state.
      *
      * @return array<string, mixed>
+     * @throws \Exception
      */
     public function definition(): array
     {
+        static $usedIds = [];
+
+        do {
+            $nationalId = str_pad($this->faker->numberBetween(0, 9999999999), 10, '0', STR_PAD_LEFT);
+        } while (in_array($nationalId, $usedIds));
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
+            'national_id' => $nationalId,
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
