@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
 
 class RequestRejectedNotification extends Notification implements ShouldQueue
 {
@@ -14,7 +15,7 @@ class RequestRejectedNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct()
+    public function __construct(protected array $mail)
     {
         //
     }
@@ -34,10 +35,11 @@ class RequestRejectedNotification extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+
         return (new MailMessage)
             ->subject('Your Request Has Been Rejected')
-            ->line('Unfortunately, your request has been rejected.')
-            ->action('View Request Details', url('/'))
+            ->line($this->mail['description'])
+            ->action('View Request Details', route('show-reject-description', $this->mail['submit_id']))
             ->line('Thank you for your understanding.');
     }
 

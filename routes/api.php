@@ -9,5 +9,6 @@ Route::post('/submit-request-form/store',[SubmitRequestController::class,'store'
 
 Route::get('/dashboard/submit-request/review',[SubmitRequestApprovalController::class,'review']);
 Route::post('/dashboard/submit-request/decision',[SubmitRequestApprovalController::class,'decision']);
-Route::post('/dashboard/submit-request/reject-description',[SubmitRequestApprovalController::class,'rejectDescription']);
+
+Route::get('/dashboard/submit-request/show-reject-description/{id}',[SubmitRequestApprovalController::class,'showRejectDescription'])->name('show-reject-description');
 

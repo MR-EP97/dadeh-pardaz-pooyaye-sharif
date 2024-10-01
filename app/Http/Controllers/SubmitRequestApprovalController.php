@@ -29,15 +29,17 @@ class SubmitRequestApprovalController extends Controller
                 $submitRequests->rejectionReason()->create([
                     'description' => $req['reason']
                 ]);
-                $submitRequests->user->notify(new RequestRejectedNotification());
+                $mail['submit_id'] = $req['id'];
+                $mail['description'] = $req['reason'];
+                $submitRequests->user->notify(new RequestRejectedNotification($mail));
             }
 
 
         }
     }
 
-    public function rejectDescription()
+    public function showRejectDescription($id)
     {
-
+        return SubmitRequest::query()->find($id)->rejectionReason->description;
     }
 }
