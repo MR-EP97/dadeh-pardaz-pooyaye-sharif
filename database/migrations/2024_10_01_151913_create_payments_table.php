@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->string('status')->default('processing');
             $table->string('getaway');
-            $table->foreignId('submit_request_id')->constrained();
+            $table->foreignId('submit_request_id')->constrained('submit_requests')->onDelete('cascade');
             $table->timestamps();
         });
     }

@@ -33,6 +33,6 @@ class SubmitRequest extends Model
 
     public function payment(): HasOne
     {
-        return $this->hasOne(Payment::class);
+        return $this->hasOne(Payment::class,'submit_request_id','id');
     }
 }

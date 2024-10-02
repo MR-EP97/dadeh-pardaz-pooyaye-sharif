@@ -6,6 +6,7 @@ use App\Enums\Payment\BankUrl;
 use App\Enums\Payment\PaymentStatus;
 use App\Enums\SubmitRequestStatus;
 use App\Interfaces\PaymentGatewayInterface;
+use App\Models\Payment;
 use App\Models\SubmitRequest;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
@@ -66,22 +67,26 @@ class BankOnePaymentGateway implements PaymentGatewayInterface
 
     public function savePaymentRecord(array $paymentData, SubmitRequest $submitRequest): void
     {
+
         $submitRequest->update(['status' => SubmitRequestStatus::CLOSED]);
 
         if ($this->handlePaymentResponse($paymentData)) {
-            $submitRequest->payment()->create([
-                'code' => $paymentData['code'],
+
+            Payment::query()->create([
+                'code' => $paymentData['data']['code'],
                 'status' => PaymentStatus::SUCCESS,
                 'getaway' => class_basename(__CLASS__),
+                'submit_request_id' => $submitRequest->id
             ]);
+
         } else {
-            $submitRequest->payment()->create([
-                'code' => $paymentData['code'],
+            Payment::query()->create([
+                'code' => $paymentData['data']['code'],
                 'status' => PaymentStatus::FAILED,
                 'getaway' => class_basename(__CLASS__),
+                'submit_request_id' => $submitRequest->id
             ]);
         }
-        $submitRequest->save();
 
     }
 

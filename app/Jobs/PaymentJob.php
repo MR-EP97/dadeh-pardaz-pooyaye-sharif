@@ -9,6 +9,7 @@ use App\Models\SubmitRequest;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentJob implements ShouldQueue
 {
@@ -33,7 +34,7 @@ class PaymentJob implements ShouldQueue
             DB::beginTransaction();
             if ($paymentResponse = $this->gateway->initiatePayment($this->submitRequest['amount'], $this->submitRequest['iban'])) {
                 // Connected to the gateway, received a response, and the transaction may or may not be successful.
-\Log::info('lo');
+
                 $this->gateway->savePaymentRecord($paymentResponse, $this->submitRequest);
             } else {
                 // Failed to connect to the gateway.
@@ -44,7 +45,7 @@ class PaymentJob implements ShouldQueue
             DB::commit();
         } catch (\Exception $e) {
             DB::rollback();
-            //log
+            Log::error($e->getMessage());
         }
     }
 }

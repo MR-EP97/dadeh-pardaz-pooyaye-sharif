@@ -20,9 +20,9 @@ class PaymentController extends Controller
     public function __invoke()
     {
 
-        $submitRequests = SubmitRequest::query()->where('status', 'approved')->get();
-        foreach ($submitRequests as $submitRequest) {
+        $submitRequests = SubmitRequest::where('status', SubmitRequestStatus::APPROVED)->get();
 
+        foreach ($submitRequests as $submitRequest) {
             switch ($this->getBankCode((string)$submitRequest->iban)) {
                 case '11':
                     $gateway = PaymentGatewayFactory::create('bank_one');
