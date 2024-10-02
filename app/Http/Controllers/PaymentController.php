@@ -10,6 +10,7 @@ use App\Services\PaymentServices\PaymentGatewayFactory;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PaymentController extends Controller
 {
@@ -35,7 +36,7 @@ class PaymentController extends Controller
                 default:
                     $submitRequest->update(['status' => SubmitRequestStatus::INVALID_ACCOUNT]);
                     $submitRequest->save();
-                    //log
+                    Log::channel('submit-request')->error('Invalid SHABA number - ' . json_encode($submitRequest->toArray()));
                     continue 2;
             }
             PaymentJob::dispatch($submitRequest, $gateway);

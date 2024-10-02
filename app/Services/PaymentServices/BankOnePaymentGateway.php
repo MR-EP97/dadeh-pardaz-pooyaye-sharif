@@ -12,6 +12,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use function PHPUnit\Framework\throwException;
 
 class BankOnePaymentGateway implements PaymentGatewayInterface
@@ -26,12 +27,16 @@ class BankOnePaymentGateway implements PaymentGatewayInterface
      */
     public function initiatePayment(int $amount, string $recipientAccount): array|bool
     {
+        // for testing
         $response = [
             'code' => random_int(10 ** 5, 10 ** 6 - 1),
             'status' => 'success',
         ];
         return ['status' => 'success',
             'data' => $response,];
+        // for testing
+
+
 //
 //        $headers = [
 //            'Authorization' => 'Bearer ' . config('payment.token_bank_1'),
@@ -52,9 +57,10 @@ class BankOnePaymentGateway implements PaymentGatewayInterface
 //            );
 //        } catch (\Exception $e) {
 //            if ($e instanceof ConnectionException) {
-//                //log
+//        Log::channel('payment')->error('Connection to the' . class_basename(__CLASS__) . ' gateway was not possible .');
 //            } else {
-//                //log
+//        Log::channel('payment')->error('The request to < ' . class_basename(__CLASS__) . ' > has failed. Message: ' . $e->getMessage);
+
 //            }
 //            return false;
 //        }
@@ -72,20 +78,24 @@ class BankOnePaymentGateway implements PaymentGatewayInterface
 
         if ($this->handlePaymentResponse($paymentData)) {
 
-            Payment::query()->create([
+            $payment = Payment::query()->create([
                 'code' => $paymentData['data']['code'],
                 'status' => PaymentStatus::SUCCESS,
                 'getaway' => class_basename(__CLASS__),
                 'submit_request_id' => $submitRequest->id
             ]);
+            Log::channel('payment')->info('The transaction was completed successfully' . json_encode($payment, JSON_THROW_ON_ERROR));
+
 
         } else {
-            Payment::query()->create([
+            $payment = Payment::query()->create([
                 'code' => $paymentData['data']['code'],
                 'status' => PaymentStatus::FAILED,
                 'getaway' => class_basename(__CLASS__),
                 'submit_request_id' => $submitRequest->id
             ]);
+            Log::channel('payment')->error('The transaction failed.' . json_encode($payment, JSON_THROW_ON_ERROR));
+
         }
 
     }

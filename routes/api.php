@@ -22,5 +22,3 @@ Route::prefix('dashboard')->group(function () {
         Route::post('/pay-requests', PaymentController::class);
     });
 });
-
-

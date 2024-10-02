@@ -33,6 +33,29 @@ class SubmitRequest extends Model
 
     public function payment(): HasOne
     {
-        return $this->hasOne(Payment::class,'submit_request_id','id');
+        return $this->hasOne(Payment::class, 'submit_request_id', 'id');
+    }
+
+    /**
+     * Mask the IBAN number except for the last four digits.
+     *
+     * @return string
+     */
+    public function maskedIban(): string
+    {
+        $iban = $this->iban;
+        if (strlen($iban) > 4) {
+            return str_repeat('*', strlen($iban) - 4) . substr($iban, -4);
+        }
+        return $iban;
+    }
+
+    public function toArray(): array
+    {
+        $array = parent::toArray();
+
+        $array['iban'] = $this->maskedIban();
+
+        return $array;
     }
 }

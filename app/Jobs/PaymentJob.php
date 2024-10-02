@@ -32,20 +32,25 @@ class PaymentJob implements ShouldQueue
 
         try {
             DB::beginTransaction();
+            Log::channel('payment')->info('Request by submitID : ' . $this->submitRequest->id . ' is starting a transaction on gateway ' . class_basename($this->gateway));
+
             if ($paymentResponse = $this->gateway->initiatePayment($this->submitRequest['amount'], $this->submitRequest['iban'])) {
                 // Connected to the gateway, received a response, and the transaction may or may not be successful.
 
+                Log::channel('payment')->info('Gateway ' . class_basename($this->gateway) . ' responded successfully.');
                 $this->gateway->savePaymentRecord($paymentResponse, $this->submitRequest);
+                Log::channel('payment')->info('Payment information has been stored in the database.');
             } else {
                 // Failed to connect to the gateway.
-
+                Log::channel('submit-request')->error('Request has failed . ID = ' . $this->submitRequest->id);
                 $this->submitRequest->update(['status' => SubmitRequestStatus::FAILED]);
                 $this->submitRequest->save();
             }
             DB::commit();
+            Log::channel('payment')->info('The payment process has been completed.');
         } catch (\Exception $e) {
             DB::rollback();
-            Log::error($e->getMessage());
+            Log::channel('submit-request')->alert('Unknown exception: ' . $e->getMessage());
         }
     }
 }
