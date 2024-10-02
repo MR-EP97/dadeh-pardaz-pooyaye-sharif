@@ -7,6 +7,7 @@ use App\Http\Requests\DecisionSubmitRequest;
 use App\Http\Resources\SubmitRequestCollection;
 use App\Models\SubmitRequest;
 use App\Notifications\RequestRejectedNotification;
+use App\Services\Repository\SubmitRequestService;
 use App\Traits\JsonResponseTraits;
 use Illuminate\Http\JsonResponse;
 
@@ -15,22 +16,26 @@ class SubmitRequestApprovalController extends Controller
 {
     use JsonResponseTraits;
 
+    public function __construct(protected SubmitRequestService $submitRequestService)
+    {
+    }
+
     public function review(): JsonResponse
     {
         return $this->success(
             'Show all submit requests successfully',
-            array(new SubmitRequestCollection(SubmitRequest::paginate(10)))
+//            array(new SubmitRequestCollection(SubmitRequest::paginate(10)))
+            array(new SubmitRequestCollection($this->submitRequestService->all()))
         );
     }
 
     public function decision(DecisionSubmitRequest $request): JsonResponse
     {
         foreach ($request->input('requests_decision') as $req) {
-            $submitRequests = SubmitRequest::query()->where('id', $req['id'])->first();
-            $submitRequests->update([
+            $submitRequests = $this->submitRequestService->update([
                 'status' => $req['status'],
                 'updated_at' => now()
-            ]);
+            ], $req['id']);
             if ($req['status'] === SubmitRequestStatus::Rejected) {
                 $submitRequests->rejectionReason()->create([
                     'description' => $req['reason']
@@ -48,9 +53,10 @@ class SubmitRequestApprovalController extends Controller
 
     public function showRejectDescription($id): JsonResponse
     {
-        return $this->success(
-            'Show rejected description',
-            ['description' => SubmitRequest::query()->find($id)->rejectionReason->description]
-        );
+        return isset($this->submitRequestService->find($id)->rejectionReason->description) ?
+            $this->success(
+                'Show rejected description',
+                ['description' => $this->submitRequestService->find($id)->rejectionReason->description]) :
+            $this->error();
     }
 }

@@ -7,6 +7,7 @@ use App\Http\Resources\ExpenseResource;
 use App\Http\Resources\SubmitRequestResource;
 use App\Models\ExpenseCategory;
 use App\Models\SubmitRequest;
+use App\Services\Repository\SubmitRequestService;
 use App\Traits\JsonResponseTraits;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -15,6 +16,10 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 class SubmitRequestController extends Controller
 {
     use JsonResponseTraits;
+
+    public function __construct(protected SubmitRequestService $submitRequestService)
+    {
+    }
 
     public function create(): JsonResponse
     {
@@ -26,7 +31,7 @@ class SubmitRequestController extends Controller
 
     public function store(StoreSubmitRequest $request): JsonResponse
     {
-        $submitRequest = SubmitRequest::create($request->input());
+        $submitRequest = $this->submitRequestService->create($request->input());
         return $this->success(
             'Create submit request successfully',
             array(SubmitRequestResource::make($submitRequest)),
