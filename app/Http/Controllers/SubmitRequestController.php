@@ -9,6 +9,7 @@ use App\Models\ExpenseCategory;
 use App\Models\SubmitRequest;
 use App\Traits\JsonResponseTraits;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class SubmitRequestController extends Controller
@@ -32,4 +33,15 @@ class SubmitRequestController extends Controller
             HttpResponse::HTTP_CREATED
         );
     }
+
+    public function download($file): \Symfony\Component\HttpFoundation\BinaryFileResponse|JsonResponse
+    {
+
+        if (Storage::disk('local')->exists("submit-request/{$file}")) {
+            return response()->download(storage_path("app/private/submit-request/" . $file));
+        }
+
+        return $this->error();
+    }
+
 }

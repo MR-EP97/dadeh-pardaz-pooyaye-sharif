@@ -10,6 +10,9 @@ Route::prefix('submit-request-form')->group(function () {
     Route::post('/store', [SubmitRequestController::class, 'store']);
 });
 
+//download submit request attachments file
+Route::get('/get-file/submit-request/{file}', [SubmitRequestController::class, 'download']);
+
 
 Route::prefix('dashboard')->group(function () {
     Route::prefix('/submit-request')->group(function () {

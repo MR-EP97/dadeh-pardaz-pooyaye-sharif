@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Models\User;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Storage;
 
 class StoreSubmitRequest extends FormRequest
 {
@@ -38,11 +39,15 @@ class StoreSubmitRequest extends FormRequest
         $this->merge([
             'user_id' => User::query()->where('national_id', $this->input('national_id'))->value('id')
         ]);
-
     }
 
     protected function passedValidation(): void
     {
         $this->replace($this->except(['national_id']));
+
+        if ($this->has('attachment')) {
+            $path = Storage::disk('local')->put('submit-request', $this->file('attachment'));
+            $this->merge(['attachment' => $path]);
+        }
     }
 }

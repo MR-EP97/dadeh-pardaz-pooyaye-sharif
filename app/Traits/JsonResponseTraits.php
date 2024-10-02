@@ -18,7 +18,7 @@ trait JsonResponseTraits
     }
 
 
-    public function error(string $message = '', array $data = [], int $code = HttpResponse::HTTP_NOT_FOUND): JsonResponse
+    public function error(string $message = 'Not found', array $data = [], int $code = HttpResponse::HTTP_NOT_FOUND): JsonResponse
     {
         return response()->json([
             'status' => 'error',
