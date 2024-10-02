@@ -14,7 +14,7 @@ Route::prefix('submit-request-form')->group(function () {
 Route::prefix('dashboard')->group(function () {
     Route::prefix('/submit-request')->group(function () {
         Route::get('/review', [SubmitRequestApprovalController::class, 'review']);
-        Route::post('/decision', [SubmitRequestApprovalController::class, 'decision']);
+        Route::put('/decision', [SubmitRequestApprovalController::class, 'decision']);
         Route::get('/show-reject-description/{id}', [SubmitRequestApprovalController::class, 'showRejectDescription'])->name('show-reject-description');
         Route::post('/pay-requests', PaymentController::class);
     });

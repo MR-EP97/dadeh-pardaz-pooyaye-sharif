@@ -19,7 +19,6 @@ class PaymentController extends Controller
      */
     public function __invoke()
     {
-
         $submitRequests = SubmitRequest::where('status', SubmitRequestStatus::APPROVED)->get();
 
         foreach ($submitRequests as $submitRequest) {

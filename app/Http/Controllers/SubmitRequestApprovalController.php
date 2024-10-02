@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\SubmitRequestStatus;
 use App\Http\Requests\DecisionSubmitRequest;
-use App\Models\RejectionReason;
+use App\Http\Resources\SubmitRequestCollection;
 use App\Models\SubmitRequest;
-use App\Models\User;
 use App\Notifications\RequestRejectedNotification;
-use Illuminate\Http\Request;
+use App\Traits\JsonResponseTraits;
+use Illuminate\Http\JsonResponse;
+
 
 class SubmitRequestApprovalController extends Controller
 {
-    public function review()
+    use JsonResponseTraits;
+
+    public function review(): JsonResponse
     {
-        return SubmitRequest::with('user')->paginate(10);
+        return $this->success(
+            'Show all submit requests successfully',
+            array(new SubmitRequestCollection(SubmitRequest::paginate(10)))
+        );
     }
 
-    public function decision(DecisionSubmitRequest $request)
+    public function decision(DecisionSubmitRequest $request): JsonResponse
     {
         foreach ($request->input('requests_decision') as $req) {
             $submitRequests = SubmitRequest::query()->where('id', $req['id'])->first();
@@ -24,8 +31,7 @@ class SubmitRequestApprovalController extends Controller
                 'status' => $req['status'],
                 'updated_at' => now()
             ]);
-//            approved,rejected
-            if ($req['status'] === 'rejected') {
+            if ($req['status'] === SubmitRequestStatus::Rejected) {
                 $submitRequests->rejectionReason()->create([
                     'description' => $req['reason']
                 ]);
@@ -33,13 +39,18 @@ class SubmitRequestApprovalController extends Controller
                 $mail['description'] = $req['reason'];
                 $submitRequests->user->notify(new RequestRejectedNotification($mail));
             }
-
-
         }
+
+        return $this->success(
+            'The changes have been successfully applied'
+        );
     }
 
-    public function showRejectDescription($id)
+    public function showRejectDescription($id): JsonResponse
     {
-        return SubmitRequest::query()->find($id)->rejectionReason->description;
+        return $this->success(
+            'Show rejected description',
+            ['description' => SubmitRequest::query()->find($id)->rejectionReason->description]
+        );
     }
 }
