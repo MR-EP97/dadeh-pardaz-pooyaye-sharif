@@ -30,4 +30,9 @@ class SubmitRequest extends Model
     {
         return $this->hasOne(RejectionReason::class);
     }
+
+    public function payment(): HasOne
+    {
+        return $this->hasOne(Payment::class);
+    }
 }
