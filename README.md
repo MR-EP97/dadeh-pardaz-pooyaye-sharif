@@ -46,11 +46,12 @@ This is a Laravel project that simulates a payment gateway connected with three 
     php artisan queue:work
    
     php artisan optimize:clear
-   
-    
+
    ```
 5. CronJob
     ```sh
+   crontab -e
+   
    Add this line to the crontab file and Replace `/path/to/your/project` with the actual path to your Laravel projects
    root directory :
 
