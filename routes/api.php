@@ -11,7 +11,6 @@ Route::prefix('submit-request-form')->group(function () {
 });
 
 //download submit request attachments file
-Route::get('/get-file/submit-request/{file}', [SubmitRequestController::class, 'download']);
 
 
 Route::prefix('dashboard')->group(function () {
@@ -20,5 +19,6 @@ Route::prefix('dashboard')->group(function () {
         Route::put('/decision', [SubmitRequestApprovalController::class, 'decision']);
         Route::get('/show-reject-description/{id}', [SubmitRequestApprovalController::class, 'showRejectDescription'])->name('show-reject-description');
         Route::post('/pay-requests', PaymentController::class);
+        Route::get('/get-file/{file}', [SubmitRequestController::class, 'download']);
     });
 });
