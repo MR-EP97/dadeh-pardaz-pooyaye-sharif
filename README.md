@@ -6,9 +6,7 @@
 
 ## Introduction
 
-This is a simple Laravel project that demonstrates the basic setup and usage of Laravel framework. It includes user
-authentication(sanctum), database migrations, and a basic CRUD functionality.
-
+This is a Laravel project that simulates a payment gateway connected with three banks. In this project, a transaction request is created, and the transactions are processed either manually or automatically (daily) upon approval.
 ### Requirements
 
 * PHP >= 8.1
@@ -53,10 +51,10 @@ authentication(sanctum), database migrations, and a basic CRUD functionality.
    ```
 5. CronJob
     ```sh
-   Add this line to the crontab file and Replace `/path/to/your/project` with the actual path to your Laravel project's
+   Add this line to the crontab file and Replace `/path/to/your/project` with the actual path to your Laravel projects
    root directory :
 
-   " * * * * * php /path/to/your/project/artisan schedule:run >> /dev/null 2>&1 "
+    * * * * * php /path/to/your/project/artisan schedule:run >> /dev/null 2>&1
       ```
 
 For more information and to test the software, enter the file " dadeh-pardaz-pooyaye-sharif.postman_collection.json " available in the project into Postman.
